@@ -4,15 +4,39 @@ namespace App\Http\Controllers;
 
 use App\Models\Purchase;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class PurchaseController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $search = $request->input('search');
+        $query = Purchase::query();
+
+        if ($search) {
+            // Check if it's a date or purchase ID
+            if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $search)) {
+                // Search by date
+                $query->whereDate('created_at', $search);
+            } else {
+                // Search by purchase ID
+                $query->where('id', '=', $search);
+            }
+        }
+
+        $purchases =
+            $query->with(['items', 'staff'])->get();
+
+        $locations = Purchase::distinct()->pluck('location');
+
+        return Inertia::render('Purchase/purchase', [
+            'purchases' => $purchases,
+            'locations' => $locations,
+            'search' => $search
+        ]);
     }
 
     /**
