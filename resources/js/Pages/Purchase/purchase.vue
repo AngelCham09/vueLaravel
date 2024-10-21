@@ -25,6 +25,9 @@ const props = defineProps({
     search: {
         type: String,
     },
+    reserves: {
+        type: Object,
+    },
 });
 
 const search = ref(props.search);
@@ -75,21 +78,31 @@ const searchForm = () => {
 };
 
 onMounted(() => {
+    console.log(props.reserves);
     columns.value = Object.keys(props.locations).map((key) => ({
         label: props.locations[key],
         value: key,
     }));
 });
 
-
 const showOptions = ref(false);
-const toggleDropdown = () =>{
+const toggleDropdown = () => {
     showOptions.value = !showOptions.value;
-}
+};
 </script>
 
 <template>
     <Head title="Purchase" />
+
+     <div>
+        <div v-for="reserve in reserves" :key="reserve.id">
+            <h3>Reserve ID: {{ reserve.id }}</h3>
+            <div v-for="deposit in reserve.deposits" :key="deposit.id">
+                <p>Deposit ID: {{ deposit.id }}</p>
+                <p>Transaction ID: {{ deposit.transaction ? deposit.transaction.id : 'No transaction found' }}</p>
+            </div>
+        </div>
+    </div>
 
     <AuthenticatedLayout>
         <template #header>
@@ -163,13 +176,21 @@ const toggleDropdown = () =>{
                         placeholder="Reviews"
                     />
 
+
                     <Dropdown
-                        v-if="showOptions"
                         v-model="selectedReviews"
                         :options="reviews"
                         optionLabel="name"
-                        placeholder="Reviews"
+                        v-if="showOptions"
                         @hide="showOptions = false"
+                        placeholder="Select an option"
+                        appendTo="body"
+                        :style="{
+                            position: 'absolute',
+                            top: '100%',
+                            left: '0',
+                            zIndex: '1000',
+                        }"
                     />
                 </template>
 

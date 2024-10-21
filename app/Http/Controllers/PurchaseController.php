@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Purchase;
+use App\Models\Reserve;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -32,10 +33,17 @@ class PurchaseController extends Controller
 
         $locations = Purchase::distinct()->pluck('location');
 
+
+        //test deposit
+        $reserves = Reserve::with(['deposits.transaction'])->get();
+
+        // dd($reserves);
+
         return Inertia::render('Purchase/purchase', [
             'purchases' => $purchases,
             'locations' => $locations,
-            'search' => $search
+            'search' => $search,
+            'reserves' => $reserves,
         ]);
     }
 
