@@ -28,6 +28,9 @@ const props = defineProps({
     reserves: {
         type: Object,
     },
+    platform: {
+        type: String,
+    }
 });
 
 const search = ref(props.search);
@@ -77,13 +80,24 @@ const searchForm = () => {
     );
 };
 
+const showBox = ref(false);
+
 onMounted(() => {
     console.log(props.reserves);
+    showBox.value = props.platform ? true : false;
     columns.value = Object.keys(props.locations).map((key) => ({
         label: props.locations[key],
         value: key,
     }));
 });
+
+const setPlatform = () => {
+    router.get(
+         route("purchase.index"),
+        { platform: "abc" },
+        { replace: true }
+    );
+};
 
 const showOptions = ref(false);
 const toggleDropdown = () => {
@@ -94,12 +108,24 @@ const toggleDropdown = () => {
 <template>
     <Head title="Purchase" />
 
-     <div>
-        <div v-for="reserve in reserves" :key="reserve.id">
+    <a @click="setPlatform">Set Platform</a>
+
+    <div v-if="showBox">
+        <h2>Platform: {{platform}}</h2>
+    </div>
+    <div>
+    <div v-for="reserve in reserves" :key="reserve.id">
             <h3>Reserve ID: {{ reserve.id }}</h3>
             <div v-for="deposit in reserve.deposits" :key="deposit.id">
                 <p>Deposit ID: {{ deposit.id }}</p>
-                <p>Transaction ID: {{ deposit.transaction ? deposit.transaction.id : 'No transaction found' }}</p>
+                <p>
+                    Transaction ID:
+                    {{
+                        deposit.transaction
+                            ? deposit.transaction.id
+                            : "No transaction found"
+                    }}
+                </p>
             </div>
         </div>
     </div>
@@ -175,7 +201,6 @@ const toggleDropdown = () => {
                         optionLabel="name"
                         placeholder="Reviews"
                     />
-
 
                     <Dropdown
                         v-model="selectedReviews"

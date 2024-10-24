@@ -14,6 +14,8 @@ class PurchaseController extends Controller
      */
     public function index(Request $request)
     {
+
+        $platform = $request->get('platform');
         $search = $request->input('search');
         $query = Purchase::query();
 
@@ -44,6 +46,7 @@ class PurchaseController extends Controller
             'locations' => $locations,
             'search' => $search,
             'reserves' => $reserves,
+            'platform' => $platform
         ]);
     }
 
